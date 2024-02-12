@@ -1,0 +1,8 @@
+encryption:
+  enabled: true
+  types:
+    base64:
+      enabled: true
+    other:
+      enabled: false
+      secret: 'abcdefghi'

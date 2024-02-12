@@ -9,6 +9,7 @@ import io.micronaut.http.annotation.Post;
 import io.reactivex.Flowable;
 import io.reactivex.schedulers.Schedulers;
 import lombok.extern.slf4j.Slf4j;
+import org.example.config.nodes.EncryptionConfig;
 import org.example.constant.Constants;
 import org.example.interfaces.IPrivacyVaultService;
 import org.example.model.enums.Action;
@@ -20,8 +21,6 @@ import org.example.model.response.PingResponse;
 import org.example.model.response.PrivacyVaultResponse;
 import org.example.model.response.TokenizeResponse;
 import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import javax.inject.Inject;
@@ -32,8 +31,13 @@ public class PrivacyVaultController {
     @Inject
     IPrivacyVaultService privacyVaultService;
 
+    @Inject
+    EncryptionConfig config;
+
+
     @Get("/ping")
     public Publisher<MutableHttpResponse<PingResponse>> ping() {
+        log.info("Config: {}", config);
         return Flowable.fromCallable(() -> HttpResponse.ok(
                 PingResponse.builder()
                         .result(

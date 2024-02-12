@@ -1,4 +1,4 @@
-package org.example.encryption;
+package org.example.service.encryption;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.interfaces.IEncryptionService;

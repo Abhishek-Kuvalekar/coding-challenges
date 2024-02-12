@@ -17,7 +17,6 @@ import java.util.Objects;
 @Singleton
 @Slf4j
 public class PrivacyVaultService implements IPrivacyVaultService {
-
     @Override
     public TokenizeResponse tokenize(TokenizeRequest request) {
         if (Objects.isNull(request.getData()) || request.getData().isEmpty()) {
@@ -33,7 +32,7 @@ public class PrivacyVaultService implements IPrivacyVaultService {
         }
 
 
-
+        return TokenizeResponse.builder().build();
 
     }
 
