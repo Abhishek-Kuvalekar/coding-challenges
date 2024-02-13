@@ -32,7 +32,6 @@ public class EncryptionFactory {
             return context.getBean(NoopEncryptionService.class);
         }
 
-        
-
+        return context.getBean(NoopEncryptionService.class);
     }
 }
