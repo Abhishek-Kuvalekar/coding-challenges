@@ -53,7 +53,7 @@ public class PrivacyVaultController {
     @Post("/tokenize")
     public Publisher<MutableHttpResponse<TokenizeResponse>> tokenize(@Body TokenizeRequest request) {
         return Flowable.fromCallable(() -> {
-            MDC.put(Constants.MDC_REQUEST_ID, request.getRequestId());
+            MDC.put(Constants.MDC_REQUEST_ID, String.format("%s: %s", Constants.MDC_REQUEST_ID, request.getRequestId()));
 
             log.info("Initiating tokenization");
             TokenizeResponse response = privacyVaultService.tokenize(request);
@@ -66,7 +66,8 @@ public class PrivacyVaultController {
     @Post("/detokenize")
     public Publisher<MutableHttpResponse<DetokenizeResponse>> detokenize(@Body DetokenizeRequest request) {
         return Flowable.fromCallable(() -> {
-            MDC.put(Constants.MDC_REQUEST_ID, request.getRequestId());
+            MDC.put(Constants.MDC_REQUEST_ID, String.format("%s: %s", Constants.MDC_REQUEST_ID, request.getRequestId()));
+
             return HttpResponse.ok(privacyVaultService.detokenize(request));
         }).subscribeOn(Schedulers.io()).doFinally(MDC::clear);
     }

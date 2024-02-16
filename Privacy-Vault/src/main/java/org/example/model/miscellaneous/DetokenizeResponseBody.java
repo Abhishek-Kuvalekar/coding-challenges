@@ -9,7 +9,7 @@ import java.util.Map;
 @Getter
 @Setter
 @Builder
-public class TokenizeResponseBody {
+public class DetokenizeResponseBody {
     private String requestId;
-    private Map<String, String> data;
+    private Map<String, DetokenizeFieldResponseBody> data;
 }

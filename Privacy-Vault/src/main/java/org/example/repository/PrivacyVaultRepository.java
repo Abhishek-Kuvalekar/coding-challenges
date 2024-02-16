@@ -3,7 +3,7 @@ package org.example.repository;
 import lombok.extern.slf4j.Slf4j;
 import org.example.factory.PrivacyVaultRepoFactory;
 import org.example.interfaces.IPrivacyVaultRepository;
-import org.example.model.dto.TokenizeDto;
+import org.example.model.dto.PrivacyVaultDto;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -16,13 +16,13 @@ public class PrivacyVaultRepository implements IPrivacyVaultRepository {
     PrivacyVaultRepoFactory factory;
 
     @Override
-    public boolean saveTokens(List<TokenizeDto> dtos) {
+    public boolean saveTokens(List<PrivacyVaultDto> dtos) {
         IPrivacyVaultRepository repository = factory.getPrivacyVaultRepo();
         return repository.saveTokens(dtos);
     }
 
     @Override
-    public void fetchValues(List<TokenizeDto> dtos) {
+    public void fetchValues(List<PrivacyVaultDto> dtos) {
         IPrivacyVaultRepository repository = factory.getPrivacyVaultRepo();
         repository.fetchValues(dtos);
     }

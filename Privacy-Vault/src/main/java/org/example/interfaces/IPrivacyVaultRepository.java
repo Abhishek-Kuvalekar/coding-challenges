@@ -1,10 +1,10 @@
 package org.example.interfaces;
 
-import org.example.model.dto.TokenizeDto;
+import org.example.model.dto.PrivacyVaultDto;
 
 import java.util.List;
 
 public interface IPrivacyVaultRepository {
-    boolean saveTokens(List<TokenizeDto> dtos);
-    void fetchValues(List<TokenizeDto> dtos);
+    boolean saveTokens(List<PrivacyVaultDto> dtos);
+    void fetchValues(List<PrivacyVaultDto> dtos);
 }

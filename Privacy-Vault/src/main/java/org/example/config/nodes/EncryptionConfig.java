@@ -23,8 +23,9 @@ public class EncryptionConfig {
         private Base64Encryption base64;
         private OtherEncryption other;
 
-        @Getter
-        private List<EncryptionType> encryptionTypes = Arrays.<EncryptionType>asList(base64, other);
+        public List<EncryptionType> getEncryptionTypes() {
+            return Arrays.asList(base64, other);
+        }
 
         @ConfigurationProperties("base64")
         public static class Base64Encryption extends EncryptionType {
@@ -38,6 +39,7 @@ public class EncryptionConfig {
         @Setter
         @ToString
         public static abstract class EncryptionType {
+            private String name;
             private boolean enabled;
             private String secret;
         }

@@ -2,12 +2,15 @@ package org.example.service;
 
 import io.micronaut.core.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.example.factory.PrivacyVaultRepoFactory;
+import org.example.constant.Constants;
 import org.example.interfaces.IPrivacyVaultService;
-import org.example.model.dto.TokenizeDto;
+import org.example.model.dto.PrivacyVaultDto;
 import org.example.model.enums.Action;
 import org.example.model.enums.Reason;
 import org.example.model.enums.Status;
+import org.example.model.miscellaneous.DetokenizeFieldResponseBody;
+import org.example.model.miscellaneous.DetokenizeResponseBody;
+import org.example.model.miscellaneous.TokenizeResponseBody;
 import org.example.model.request.DetokenizeRequest;
 import org.example.model.request.TokenizeRequest;
 import org.example.model.response.DetokenizeResponse;
@@ -18,10 +21,7 @@ import org.example.service.encryption.EncryptionService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Objects;
-import java.util.List;
+import java.util.*;
 
 @Singleton
 @Slf4j
@@ -46,17 +46,15 @@ public class PrivacyVaultService implements IPrivacyVaultService {
                     .build();
         }
 
-        List<TokenizeDto> tokenizeDtos = new ArrayList<>();
-        String token;
         try {
+            List<PrivacyVaultDto> tokenizeDtos = new ArrayList<>();
             for (Map.Entry<String, String> entry : request.getData().entrySet()) {
                 if (StringUtils.isEmpty(entry.getKey())) continue;
-                token = encryptionService.encrypt(entry.getValue());
                 tokenizeDtos.add(
-                        TokenizeDto.builder()
+                        PrivacyVaultDto.builder()
                                 .key(entry.getKey())
                                 .value(entry.getValue())
-                                .token(token)
+                                .token(encryptionService.encrypt(entry.getValue()))
                                 .build()
                 );
             }
@@ -74,9 +72,24 @@ public class PrivacyVaultService implements IPrivacyVaultService {
                         .build();
             }
 
-            TokenizeResponse.TokenizeResponseBuilder builder = TokenizeResponse.builder();
+            Map<String, String> map = new HashMap<>();
+            tokenizeDtos.forEach(tokenizeDto -> map.put(tokenizeDto.getKey(), tokenizeDto.getToken()));
 
-            return builder.build();
+            return TokenizeResponse.builder()
+                    .result(
+                            PrivacyVaultResponse.builder()
+                                    .status(Status.SUCCESS)
+                                    .action(Action.ACCEPTED)
+                                    .reason(Reason.SUCCESS)
+                                    .build()
+                    )
+                    .body(
+                            TokenizeResponseBody.builder()
+                                    .requestId(request.getRequestId())
+                                    .data(map)
+                                    .build()
+                    )
+                    .build();
         } catch (Exception ex) {
             log.error("Error while tokenizing.", ex);
             return TokenizeResponse.builder()
@@ -92,6 +105,67 @@ public class PrivacyVaultService implements IPrivacyVaultService {
 
     @Override
     public DetokenizeResponse detokenize(DetokenizeRequest request) {
-        return null;
+        if (Objects.isNull(request.getData()) || request.getData().isEmpty()) {
+            return DetokenizeResponse.builder()
+                    .result(
+                            PrivacyVaultResponse.builder()
+                                    .status(Status.ERROR)
+                                    .action(Action.REJECTED)
+                                    .reason(Reason.INVALID_DATA)
+                                    .build()
+                    )
+                    .build();
+        }
+
+        try {
+            List<PrivacyVaultDto> detokenizeDtos = new ArrayList<>();
+            for (Map.Entry<String, String> entry : request.getData().entrySet()) {
+                detokenizeDtos.add(
+                        PrivacyVaultDto.builder()
+                                .key(entry.getKey())
+                                .token(entry.getValue())
+                                .build()
+                );
+            }
+
+            repository.fetchValues(detokenizeDtos);
+
+            Map<String, DetokenizeFieldResponseBody> map = new HashMap<>();
+            detokenizeDtos.forEach(detokenizeDto -> {
+                map.put(
+                        detokenizeDto.getKey(),
+                        DetokenizeFieldResponseBody.builder()
+                                .found(detokenizeDto.getValue() != null)
+                                .value(detokenizeDto.getValue() == null ? Constants.DETOKENIZE_VALUE_NOT_FOUND : detokenizeDto.getValue())
+                                .build()
+                );
+            });
+
+            return DetokenizeResponse.builder()
+                    .result(
+                            PrivacyVaultResponse.builder()
+                                    .status(Status.SUCCESS)
+                                    .action(Action.ACCEPTED)
+                                    .reason(Reason.SUCCESS)
+                                    .build()
+                    )
+                    .body(
+                            DetokenizeResponseBody.builder()
+                                    .requestId(request.getRequestId())
+                                    .data(map)
+                                    .build()
+                    )
+                    .build();
+        } catch (Exception ex) {
+            log.error("Error while detokenizing.", ex);
+            return DetokenizeResponse.builder()
+                    .result(
+                            PrivacyVaultResponse.builder()
+                                    .status(Status.ERROR)
+                                    .action(Action.REJECTED)
+                                    .reason(Reason.PROCESSING_FAILED)
+                                    .build()
+                    ).build();
+        }
     }
 }

@@ -1,12 +1,11 @@
 package org.example.repository;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.example.interfaces.IPrivacyVaultRepository;
-import org.example.model.dto.TokenizeDto;
+import org.example.model.dto.PrivacyVaultDto;
+import org.example.model.miscellaneous.PrivacyVaultRow;
 
 import javax.inject.Singleton;
 import java.time.LocalDateTime;
@@ -24,10 +23,10 @@ public class PrivacyVaultInMemoryRepository implements IPrivacyVaultRepository {
     }
 
     @Override
-    public boolean saveTokens(List<TokenizeDto> dtos) {
+    public boolean saveTokens(List<PrivacyVaultDto> dtos) {
         try {
             boolean ans = true;
-            for (TokenizeDto dto : dtos) {
+            for (PrivacyVaultDto dto : dtos) {
                 ans = ans && storage.upsert(dto);
             }
             return ans;
@@ -38,15 +37,15 @@ public class PrivacyVaultInMemoryRepository implements IPrivacyVaultRepository {
     }
 
     @Override
-    public void fetchValues(List<TokenizeDto> dtos) {
+    public void fetchValues(List<PrivacyVaultDto> dtos) {
         try {
             dtos.stream()
                     .forEach(dto -> {
-                        Optional<PrivacyVaultStorage.PrivacyVaultRow> rowOptional = storage.fetch(dto);
+                        Optional<PrivacyVaultRow> rowOptional = storage.fetch(dto);
                         if (rowOptional.isEmpty()) {
                             dto.setValue(null);
                         } else {
-                            dto.setValue(rowOptional.get().getToken());
+                            dto.setValue(rowOptional.get().getValue());
                         }
                     });
 
@@ -65,15 +64,15 @@ public class PrivacyVaultInMemoryRepository implements IPrivacyVaultRepository {
             rows = new ArrayList<>();
         }
 
-        public boolean upsert(TokenizeDto dto) {
+        public boolean upsert(PrivacyVaultDto dto) {
             Optional<PrivacyVaultRow> existingRowOptional = rows.stream()
-                                                                .filter(row -> row.key.equals(dto.getKey()))
+                                                                .filter(row -> row.getKey().equals(dto.getKey()))
                                                                 .findFirst();
             existingRowOptional.ifPresentOrElse(
                     row -> {
                         row.setValue(dto.getValue());
                         row.setToken(dto.getToken());
-                        row.setCreatedAt(LocalDateTime.now());
+                        row.setUpdatedAt(LocalDateTime.now());
                     },
                     () -> rows.add(
                             PrivacyVaultRow.builder()
@@ -89,23 +88,10 @@ public class PrivacyVaultInMemoryRepository implements IPrivacyVaultRepository {
             return true;
         }
 
-        public Optional<PrivacyVaultRow> fetch(TokenizeDto dto)  {
+        public Optional<PrivacyVaultRow> fetch(PrivacyVaultDto dto)  {
             return rows.stream()
                     .filter(row -> row.getKey().equals(dto.getKey()) && row.getToken().equals(dto.getToken()))
                     .findFirst();
-        }
-
-        @Getter
-        @Setter
-        @Builder
-        @ToString
-        private class PrivacyVaultRow {
-            private long id;
-            private String key;
-            private String value;
-            private String token;
-            private LocalDateTime createdAt;
-            private LocalDateTime updatedAt;
         }
     }
 }
