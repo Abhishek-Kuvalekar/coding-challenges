@@ -23,6 +23,7 @@ dependencies {
     implementation(platform("io.micronaut:micronaut-bom:2.3.0"))
     implementation("io.micronaut:micronaut-inject")
     implementation("io.micronaut:micronaut-aop")
+    implementation("io.micronaut:micronaut-security-jwt:1.4.0")
     testAnnotationProcessor(platform("io.micronaut:micronaut-bom:2.3.0"))
     testAnnotationProcessor("io.micronaut:micronaut-inject-java")
 

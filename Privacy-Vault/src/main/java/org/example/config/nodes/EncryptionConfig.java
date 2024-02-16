@@ -38,7 +38,7 @@ public class EncryptionConfig {
         @Getter
         @Setter
         @ToString
-        public static abstract class EncryptionType {
+        public abstract static class EncryptionType {
             private String name;
             private boolean enabled;
             private String secret;

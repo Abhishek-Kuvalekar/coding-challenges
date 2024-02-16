@@ -1,3 +1,36 @@
+micronaut:
+  security:
+    enabled: true
+    endpoints:
+      login:
+        enabled: true
+        path: /privacy-vault/login
+      oauth:
+        enabled: true
+        path: /privacy-vault/refresh-token
+    token:
+      basic-auth:
+        enabled: true
+      jwt:
+        enabled: true
+        signatures:
+          secret:
+            generator:
+              secret: 'Q29kaW5nQ2hhbGxFbmdlUHJpdkBDeVZhdWx0MTIzIzA5QWJoaXNoZWtEaWRJdA=='
+              base64: true
+              jws-algorithm: HS256
+        generator:
+          access-token-expiration: 604800      # 7 days
+          refresh-token-expiration: 5184000    # 60 days
+
+auth:
+  admin:
+    username: 'privacy-vault-admin'
+    password: 'Admin@123'
+  consumer:
+    username: 'privacy-vault-consumer'
+    password: 'Consumer@123'
+
 encryption:
   enabled: true
   types:

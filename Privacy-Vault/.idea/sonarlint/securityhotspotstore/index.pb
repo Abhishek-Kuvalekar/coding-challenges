@@ -51,3 +51,16 @@ Bsrc/main/java/org/example/model/response/PrivacyVaultResponse.java,5/d/5d9d637
 Nsrc/main/java/org/example/model/miscellaneous/DetokenizeFieldResponseBody.java,d/e/ded3c3a1671384106ca8095bd14e2f1f2150f94c
 y
 Isrc/main/java/org/example/model/miscellaneous/DetokenizeResponseBody.java,1/8/182f5f48687e080ebaaaa6c305cc1918fdcc9033
+:
+
+.gitignore,a/5/a5cc2925ca8258af241be7e5b0381edf30266302
+f
+6src/main/java/org/example/config/nodes/AuthConfig.java,b/8/b85b745070ab957529497d2de660a7282cd9f1b4
+o
+?src/main/java/org/example/config/manager/AuthConfigManager.java,e/1/e1bd9594220344e68ce35f0bdd92c18332a6968a
+j
+:src/main/java/org/example/auth/AuthenticationProvider.java,d/2/d227863b5405bff670d963d61c6da5e6dfe82a90
+<
+build.gradle,f/0/f07866736216be0ee2aba49e392191aeae700a35
+v
+Fsrc/main/java/org/example/auth/PrivacyVaultAuthenticationProvider.java,4/2/4232bede5e4d773c8e7e058f41fdec3367f1af37

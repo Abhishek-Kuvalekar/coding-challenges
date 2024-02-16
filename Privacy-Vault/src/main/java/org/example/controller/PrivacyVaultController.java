@@ -6,6 +6,8 @@ import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import io.reactivex.Flowable;
 import io.reactivex.schedulers.Schedulers;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,7 @@ import javax.inject.Inject;
 
 @Controller("/privacy-vault")
 @Slf4j
+@Secured(SecurityRule.IS_AUTHENTICATED)
 public class PrivacyVaultController {
     @Inject
     IPrivacyVaultService privacyVaultService;
@@ -36,6 +39,7 @@ public class PrivacyVaultController {
 
 
     @Get("/ping")
+    @Secured(SecurityRule.IS_ANONYMOUS)
     public Publisher<MutableHttpResponse<PingResponse>> ping() {
         log.info("Config: {}", config);
         return Flowable.fromCallable(() -> HttpResponse.ok(
@@ -51,6 +55,7 @@ public class PrivacyVaultController {
     }
 
     @Post("/tokenize")
+    @Secured({Constants.AUTH_ROLE_ADMIN})
     public Publisher<MutableHttpResponse<TokenizeResponse>> tokenize(@Body TokenizeRequest request) {
         return Flowable.fromCallable(() -> {
             MDC.put(Constants.MDC_REQUEST_ID, String.format("%s: %s", Constants.MDC_REQUEST_ID, request.getRequestId()));
@@ -64,6 +69,7 @@ public class PrivacyVaultController {
     }
 
     @Post("/detokenize")
+    @Secured({Constants.AUTH_ROLE_CONSUMER})
     public Publisher<MutableHttpResponse<DetokenizeResponse>> detokenize(@Body DetokenizeRequest request) {
         return Flowable.fromCallable(() -> {
             MDC.put(Constants.MDC_REQUEST_ID, String.format("%s: %s", Constants.MDC_REQUEST_ID, request.getRequestId()));
