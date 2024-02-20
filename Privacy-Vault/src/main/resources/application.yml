@@ -36,8 +36,8 @@ encryption:
   types:
     base64:
       name: 'base64'
-      enabled: true
-    other:
-      name: 'other'
       enabled: false
-      secret: 'abcdefghi'
+    des:
+      name: 'des'
+      enabled: true
+      secret: 'VGhpc0lzQFNlY3JldEZvckRFUw=='

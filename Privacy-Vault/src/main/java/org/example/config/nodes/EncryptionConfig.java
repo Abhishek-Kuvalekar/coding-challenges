@@ -21,18 +21,18 @@ public class EncryptionConfig {
     @ConfigurationProperties("types")
     public static class EncryptionTypes {
         private Base64Encryption base64;
-        private OtherEncryption other;
+        private DesEncryption des;
 
         public List<EncryptionType> getEncryptionTypes() {
-            return Arrays.asList(base64, other);
+            return Arrays.asList(base64, des);
         }
 
         @ConfigurationProperties("base64")
         public static class Base64Encryption extends EncryptionType {
         }
 
-        @ConfigurationProperties("other")
-        public static class OtherEncryption extends EncryptionType {
+        @ConfigurationProperties("des")
+        public static class DesEncryption extends EncryptionType {
         }
 
         @Getter

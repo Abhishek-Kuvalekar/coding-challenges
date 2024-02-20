@@ -7,6 +7,7 @@ import org.example.config.nodes.EncryptionConfig;
 import org.example.constant.Constants;
 import org.example.interfaces.IEncryptionService;
 import org.example.service.encryption.Base64EncryptionService;
+import org.example.service.encryption.DesEncryptionService;
 import org.example.service.encryption.NoopEncryptionService;
 
 import javax.inject.Inject;
@@ -38,6 +39,9 @@ public class EncryptionFactory {
 
         if (enabledEncryptionType.getName().equalsIgnoreCase(Constants.CONFIG_ENCRYPTION_TYPE_BASE64))
             return context.getBean(Base64EncryptionService.class);
+
+        if (enabledEncryptionType.getName().equalsIgnoreCase(Constants.CONFIG_ENCRYPTION_TYPE_DES))
+            return context.getBean(DesEncryptionService.class);
 
         return context.getBean(NoopEncryptionService.class);
     }
