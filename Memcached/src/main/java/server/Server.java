@@ -8,18 +8,20 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Slf4j
 public class Server {
     private final int port;
     private ServerSocket serverSocket;
     private List<ConnectionHandler> connectionHandlers;
-    private List<Thread> activeThreads;
+    private ExecutorService executorService;
 
     public Server(int port) {
         this.port = port;
         this.connectionHandlers = new ArrayList<>();
-        this.activeThreads = new ArrayList<>();
+        this.executorService = Executors.newCachedThreadPool();
     }
 
     public void start() {
@@ -39,20 +41,20 @@ public class Server {
     }
 
     private void handleConnections() {
-        while (true) {
-            try {
-                Socket socket = serverSocket.accept();
-                ConnectionHandler connectionHandler = new ConnectionHandler(socket);
-                this.connectionHandlers.add(connectionHandler);
-
-                Thread thread = new Thread(connectionHandler);
-                this.activeThreads.add(thread);
-                thread.start();
-
-            } catch (Exception ex) {
-                log.error("Failed to create a connection with a client", ex);
+        Thread connectionHandlerThread = new Thread(() -> {
+            while (true) {
+                try {
+                    Socket socket = serverSocket.accept();
+                    ConnectionHandler connectionHandler = new ConnectionHandler(socket);
+                    connectionHandlers.add(connectionHandler);
+                    executorService.submit(connectionHandler);
+                } catch (Exception ex) {
+                    log.error("Failed to create a connection with a client", ex);
+                }
             }
-        }
+        });
+
+        connectionHandlerThread.start();
     }
 
 }
