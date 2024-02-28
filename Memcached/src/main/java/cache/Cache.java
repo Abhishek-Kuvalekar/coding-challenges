@@ -76,6 +76,7 @@ public class Cache {
     private void evict() {
         while (storage.isFull()) {
             String key = policy.getKeyToBeEvicted();
+            log.info("Evicting key: {}", key);
             removeItem(key);
         }
     }

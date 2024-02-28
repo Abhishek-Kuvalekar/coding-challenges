@@ -34,7 +34,7 @@ public class DependencyInjector {
 
         synchronized (DependencyInjector.class) {
             if (Objects.nonNull(cacheStorage)) return cacheStorage;
-            cacheStorage = new CacheStorage(100);
+            cacheStorage = new CacheStorage(3);
         }
 
         return cacheStorage;
