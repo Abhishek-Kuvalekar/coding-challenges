@@ -19,42 +19,42 @@ public class CacheStorage implements ICacheStorage {
     }
 
     @Override
-    public boolean isEmpty() {
+    public synchronized boolean isEmpty() {
         return map.isEmpty();
     }
 
     @Override
-    public long size() {
+    public synchronized boolean isFull() {
+        return (size() == capacity);
+    }
+
+    @Override
+    public synchronized long size() {
         return map.size();
     }
 
     @Override
-    public boolean exists(String key) {
+    public synchronized boolean exists(String key) {
         return map.containsKey(key);
     }
 
     @Override
-    public boolean insert(String key, CacheItem item) {
+    public synchronized boolean insert(String key, CacheItem item) {
         if (StringUtils.isNullOrEmpty(key) || Objects.isNull(item)) return false;
         map.put(key, item);
         return true;
     }
 
     @Override
-    public boolean delete(String key) {
+    public synchronized boolean delete(String key) {
         if (StringUtils.isNullOrEmpty(key)) return false;
         map.remove(key);
         return true;
     }
 
     @Override
-    public CacheItem getValue(String key) {
+    public synchronized CacheItem getValue(String key) {
         if (StringUtils.isNullOrEmpty(key)) return null;
         return map.get(key);
-    }
-
-    @Override
-    public int capacity() {
-        return this.capacity;
     }
 }

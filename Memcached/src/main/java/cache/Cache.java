@@ -1,12 +1,16 @@
 package cache;
 
+import cache.exceptions.KeyNotFoundException;
 import cache.model.CacheItem;
 import cache.policy.IEvictionPolicy;
 import cache.storage.ICacheStorage;
 import ioc.DependencyInjector;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.OptionalDouble;
 
 @Slf4j
 public class Cache {
@@ -32,18 +36,56 @@ public class Cache {
     }
 
     public boolean addItem(String key, CacheItem item) {
-        return true;
+        if (storage.isFull()) evict();
+
+        boolean result = storage.insert(key, item);
+        if (!result) return result;
+
+        policy.registerKeyAccess(key);
+        return result;
     }
 
     public boolean removeItem(String key) {
-        return true;
+        if (!storage.exists(key)) return true;
+
+        boolean result = storage.delete(key);
+        if (!result) return result;
+
+        policy.removeKey(key);
+        return result;
     }
 
     public boolean exists(String key) {
-        return true;
+        return (getValue(key).isPresent());
     }
 
-    public CacheItem getValue(String key) {
-        return new CacheItem();
+    public Optional<CacheItem> getValue(String key) {
+        if (!storage.exists(key)) return Optional.empty();
+
+        CacheItem item = storage.getValue(key);
+        policy.registerKeyAccess(key);
+
+        if (isItemExpired(item)) {
+            removeItem(key);
+            return Optional.empty();
+        }
+
+        return Optional.of(item);
+    }
+
+    private void evict() {
+        while (storage.isFull()) {
+            String key = policy.getKeyToBeEvicted();
+            removeItem(key);
+        }
+    }
+
+    private boolean isItemExpired(CacheItem item) {
+        if (Objects.isNull(item)) return false;
+        if (item.getExpiry() < 0) return true;
+        if (item.getExpiry() == 0) return false;
+        return item.getCreatedAt()
+                .plusSeconds(item.getExpiry())
+                .isBefore(LocalDateTime.now());
     }
 }
