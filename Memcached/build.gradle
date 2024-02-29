@@ -3,7 +3,15 @@ plugins {
 }
 
 group = 'org.example'
-version = '1.0-SNAPSHOT'
+version = '1'
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'org.example.Memcached'
+        )
+    }
+}
 
 repositories {
     mavenCentral()
@@ -13,8 +21,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    implementation 'org.projectlombok:lombok:1.18.30'
 
     implementation "ch.qos.logback:logback-classic:1.2.9"
 
