@@ -2,6 +2,7 @@ package org.example.server;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.common.Constants;
+import org.example.util.NumberUtils;
 import org.example.util.StringUtils;
 import org.slf4j.MDC;
 
@@ -10,27 +11,22 @@ import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.Objects;
 
 @Slf4j
 public class ConnectionHandler implements Runnable {
-    private final int id;
+    private int id;
     private final Socket socket;
 
-    public ConnectionHandler(int id, Socket socket) {
-        this.id = id;
+    public ConnectionHandler(Socket socket) {
+        this.id = Math.abs(NumberUtils.getRandomInteger());
         this.socket = socket;
-//        MDC.put(
-//                Constants.MDC_KEY_CONNECTION_ID,
-//                String.format(
-//                        "%s: %d",
-//                        Constants.MDC_VALUE_CONNECTION_ID,
-//                        id
-//                )
-//        );
     }
 
     @Override
     public void run() {
+        MDC.put(Constants.MDC_KEY_CONNECTION_ID, String.valueOf(this.id));
+
         log.info("Connection established with the client: {}", socket.getInetAddress());
         handleRequests();
     }
@@ -62,6 +58,16 @@ public class ConnectionHandler implements Runnable {
 
     private void closeConnection() {
         log.info("Closing connection with the client: {}", socket.getInetAddress());
-        //MDC.clear();
+
+        try {
+            if (!socket.isClosed()) {
+                socket.close();
+            }
+        } catch (Exception ex) {
+            log.error("Error while disconnecting client: {}. {}", socket.getInetAddress(), ex.getMessage());
+        }
+
+        log.info("Closed connection with the client: {}", socket.getInetAddress());
+        MDC.clear();
     }
 }
